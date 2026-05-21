@@ -500,6 +500,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Format the schedule using the new helper function
     const formattedSchedule = formatSchedule(details);
+    const shareUrl = `${window.location.origin}/static/index.html#activity=${encodeURIComponent(
+      name
+    )}`;
+    const shareText = `Check out ${name} at Mergington High School! ${formattedSchedule}`;
+    const shareMessage = `${shareText} ${shareUrl}`;
+    const encodedShareMessage = encodeURIComponent(shareMessage);
+    const encodedShareUrl = encodeURIComponent(shareUrl);
+    const encodedShareText = encodeURIComponent(shareText);
 
     // Create activity tag
     const tagHtml = `
@@ -554,6 +562,13 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("")}
         </ul>
       </div>
+      <div class="share-actions">
+        <span class="share-label">Share:</span>
+        <a class="share-button share-whatsapp" href="https://wa.me/?text=${encodedShareMessage}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        <a class="share-button share-x" href="https://twitter.com/intent/tweet?text=${encodedShareMessage}" target="_blank" rel="noopener noreferrer">X</a>
+        <a class="share-button share-facebook" href="https://www.facebook.com/sharer/sharer.php?u=${encodedShareUrl}&quote=${encodedShareText}" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <button class="share-button share-copy" data-share-message="${encodedShareMessage}" type="button">Copy</button>
+      </div>
       <div class="activity-card-actions">
         ${
           currentUser
@@ -588,6 +603,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    const copyButton = activityCard.querySelector(".share-copy");
+    copyButton.addEventListener("click", async () => {
+      const decodedShareMessage = decodeURIComponent(
+        copyButton.dataset.shareMessage
+      );
+
+      try {
+        await navigator.clipboard.writeText(decodedShareMessage);
+        showMessage("Share message copied. Send it to your friends!", "success");
+      } catch (error) {
+        showMessage("Could not copy share message. Please try again.", "error");
+      }
+    });
 
     activitiesList.appendChild(activityCard);
   }
